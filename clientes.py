@@ -7,7 +7,9 @@ class Cliente:
         self.telefono=telefono
         self.email=email
 
-
+    def imprimir(self):
+        return f"ID: {self.id_cliente} | Nombre: {self.nombre} | Teléfono: {self.telefono} | Email: {self.email}"
 objeto1=Cliente(1,'rosalba','123333','rosalba15@')
 
-print(objeto1)
+print(objeto1.nombre)
+print(objeto1.imprimir())
