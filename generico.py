@@ -6,7 +6,7 @@ class Generico():
         try:
             self.conexion=mysql.connector.connect(
                 host = 'localhost',
-                port = 3307,
+                port = 3306,
                 user = 'root',
                 password = '', 
                 database='floreria'
@@ -14,4 +14,5 @@ class Generico():
 
         except Error as error:
             print(f'No se pudo realizar la conexion con la base de datsos: {error}')
-print("Conexion exitosa")
+
+

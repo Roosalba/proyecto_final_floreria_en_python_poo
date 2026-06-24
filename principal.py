@@ -52,6 +52,7 @@ class Principal:
                print("Ingresate a la tabla Articulos ")
                self.ejecutar_articulos()
 
+             
 
 
             elif opcion_tabla =="4":
@@ -250,7 +251,16 @@ class Principal:
 
             elif opcionMenu =="2":
                 print("Listar Clientes")
-                self.clientes.listar_cliente()
+                lista=self.clientes.listar_cliente() # guardamos en la variable lista lo que retornamos
+                # validamos
+                if not lista:
+                    print("No hay Clientes")
+                    return
+                else:
+                    for clientes in lista:
+                     print(f"ID: {clientes[0]}, NOMBRE: {clientes[1]}, TELEFONO: {clientes[2]}, EMAIL: {clientes[3]} ")
+
+
 
             elif opcionMenu =="3":
                 print("Buscar Clientes ")
