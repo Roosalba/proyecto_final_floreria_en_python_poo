@@ -1,5 +1,5 @@
 from generico import Generico
-from _mysql_connector import Error
+from mysql.connector import Error
 
 
 class Proveedores:

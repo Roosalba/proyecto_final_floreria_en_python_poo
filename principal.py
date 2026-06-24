@@ -250,7 +250,7 @@ class Principal:
 
             elif opcionMenu =="2":
                 print("Listar Clientes")
-
+                self.clientes.listar_cliente()
 
             elif opcionMenu =="3":
                 print("Buscar Clientes ")
@@ -340,3 +340,6 @@ class Principal:
             else:
 
                 print("Opcion incorrecta")
+if __name__ == "__main__":
+    principal=Principal()
+    principal.ejecutar_tablas()
