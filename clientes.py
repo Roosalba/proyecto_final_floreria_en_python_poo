@@ -11,15 +11,13 @@ class Cliente:
             try:
                 cur= db.conexion.cursor()#creamos el cursor,que es el objeto que nos permite enviar sentencias sql a la base de datos.
                 cur.execute('SELECT * FROM clientes')
-
                 resultado_cliente= cur.fetchall()
-
-            
-
-                cur.close() #cerramos el cursor, es una buena practica
                 return resultado_cliente
             
             except Error as e:
                 print(f"No se pudo listar los clientes: {e}")
                 return []# esto si no hay clientes me devuelve una lista vacia
+            finally:
+                cur.close()
+                db.conexion.close()
         return[]

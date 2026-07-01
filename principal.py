@@ -141,13 +141,47 @@ class Principal:
 
             elif opcionMenu =="1":
                 print("Ingresar Categoria")
+                while True:
+                    nombre_categoria=str(input("Ingrese el nombre de la categoria: ")).strip()
+                    if nombre_categoria=="":
+                        print("El campo no puede estar vacio ")
+                        continue
+                    break
+                exito=self.categoria.registrar_categoria(nombre_categoria)
+
+                if exito:
+                    print("La categoria fue registrada con existo")
+                    
+                else:
+                    print("Hubo un error al guardar la categoria")
 
             elif opcionMenu =="2":
                 print("Listar Categoria")
+                lista=self.categoria.listar_categoria()
 
+                if not lista:
+                    print("No hay categoria para mostrar")
+                else:
+                    #Recorremos la lista categoria
+                    for cate in lista:
+                       print(f"ID: {cate[0]} | NOMBRE: {cate[1]} ")
 
             elif opcionMenu =="3":
                 print("Buscar Categoria")
+                while True:
+                    try:
+                        buscar_id=int(input("Ingrese el id a buscar: "))
+                        if buscar_id==0:
+                            print("Volviendo al menu principal.")
+                            break
+                        buscando_id=self.categoria.buscar_categoria(buscar_id)
+                        if not buscando_id:
+                            print("No se encontro la categoria con ese ID.")
+                        else:
+                            print(f"ID: {buscando_id[0]} | NOMBRE: {buscando_id[1]}")
+                            
+                    except ValueError:
+                        print("Debe ingresar un numero ")
 
             
             elif opcionMenu =="4":
