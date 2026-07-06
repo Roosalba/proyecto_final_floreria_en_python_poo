@@ -107,20 +107,118 @@ class Principal:
 
             elif opcionMenu =="1":
                 print("Ingresar proveedores")
-
+                while True:
+                    nombre_empresa=str(input("Ingrese el nombre de la empresa: ")).strip()
+                    
+                    if nombre_empresa=="":
+                        print("El campo no puede estar vacio")
+                        continue
+                    break
+                    
+                while True:
+                    telefono=str(input("Ingrese el numero de telefono: ")).strip()
+                    if telefono =="":
+                        print("El campo no puede estar vacio")
+                        continue
+                
+                    
+                    if self.proveedores.buscar_por_telefono(telefono) is not None:
+                        print("El telefono ya existe en el sistema. Ingrese otro.")
+                        continue
+                    break
+                            
+                datos=self.proveedores.registrar_proveedores(nombre_empresa,telefono)
+                if datos:
+                    print("Datos registrado  correctamente")
+                else:
+                    print("Hubo un error al registrar los datos del proveedor")
+                    
             elif opcionMenu =="2":
                 print("Listar proveedores")
-
+                lista=self.proveedores.listar_proveedores()
+                if not lista:
+                    print("No hay proveedores para mostrar")
+                else:
+                    for prove in lista:
+                        print(f"ID:{prove[0]} | NOMBRE:{prove[1]} | TELEFONO:{prove[2]}")
 
             elif opcionMenu =="3":
                 print("Buscar proveedor")
-
-            
+                while True:
+                        buscar_telefono=str(input("Ingrese el telefono a buscar, '0' para salir: ")).strip()
+                        if buscar_telefono=="":
+                            print("El campo no puede estar vacio")
+                            continue
+                        if buscar_telefono=="0":# esta la coloque por s el usuario quiere salir sin hacer nada
+                            print("volviendo al menu principal de proveedores.")
+                            break
+                        buscando_tele=self.proveedores.buscar_por_telefono(buscar_telefono)
+                        if  buscando_tele is None:
+                            print("No se encontro el proveedor con ese telefono.")
+                            continue
+                        else:
+                            print(f"ID: {buscando_tele[0]} | NOMBRE: {buscando_tele[1]} | TELEFONO: {buscando_tele[2]}")
+                            break
+                    
             elif opcionMenu =="4":
                 print("Editar Proveedor")
+                while True:
+                    try:
+                        id_editar=int(input("Ingrese el ID a editar, 0 para volver al menu de proveedores: "))
+                        if id_editar==0:
+                            print("Volviendo al menu de proveedores..")
+                            break
+                        editando_id=self.proveedores.buscar_por_id(id_editar)
+                        if editando_id:
+
+                            break
+                        else:
+                            print(f"El ID: {id_editar} no se encontro")
+                    except ValueError:
+                        print("El ID debe ser un numero entero")
+                            
+                if id_editar==0:
+                    continue
+                   
+                while True:
+                    nuevo_nombre=str(input("Nuevo Nombre: ")).strip()
+                    if nuevo_nombre=="":
+                        print("Ela campo no puede estar vacio")
+                        continue
+                    break
+                while True:
+                    nuevo_telefono=str(input("Nuevo telefono: ")).strip()
+                    if nuevo_telefono=="":
+                        print("El campo no puede estar vacio")
+                        continue
+                    break
+                        # Guardamos los cambios llamando al  metodo de editar
+                if self.proveedores.editar_proveedor(nuevo_nombre,nuevo_telefono,id_editar):
+                    print("Proveedores editado con exito")
+                else:
+                    print("Error al guardar los cambios")
+
+                            
 
             elif opcionMenu =="5":
                 print("eliminar proveedor")
+
+                while True:
+                        try:
+                            id_eliminar=int(input("Ingrese el ID a eliminar, 0 para salir: "))
+                            if id_eliminar==0:# esta la coloque por s el usuario quiere salir sin hacer nada
+                                print("volviendo al menu principal de Proveedores.")
+                                break
+                        except ValueError:
+                            print("Error debe ingresar un numero") 
+                            continue
+                        eliminado_exitoso=self.proveedores.eliminar_proveedor(id_eliminar)
+                        if not eliminado_exitoso:
+                            print(f"No existe ningun proveedor con el Id {id_eliminar}. Intente de nuevo")
+                            continue
+                        else:
+                            print("Proveedor eliminado con exito")
+                            break
 
 
             elif opcionMenu =="6":
@@ -153,7 +251,7 @@ class Principal:
                     print("La categoria fue registrada con existo")
                     
                 else:
-                    print("Hubo un error al guardar la categoria")
+                    print("Hubo un error al registrar el nombre de la categoria")
 
             elif opcionMenu =="2":
                 print("Listar Categoria")
@@ -164,15 +262,15 @@ class Principal:
                 else:
                     #Recorremos la lista categoria
                     for cate in lista:
-                       print(f"ID: {cate[0]} | NOMBRE: {cate[1]} ")
+                       print(f"ID:{cate[0]} | NOMBRE:{cate[1]} ")
 
             elif opcionMenu =="3":
                 print("Buscar Categoria")
                 while True:
                     try:
-                        buscar_id=int(input("Ingrese el id a buscar: "))
+                        buscar_id=int(input("Ingrese el id a buscar, '0' para salir: "))
                         if buscar_id==0:
-                            print("Volviendo al menu principal.")
+                            print("volviendo al menu principal.")
                             break
                         buscando_id=self.categoria.buscar_categoria(buscar_id)
                         if not buscando_id:
@@ -186,10 +284,53 @@ class Principal:
             
             elif opcionMenu =="4":
                 print("Editar Categoria")
+                while True:
+                    try:
+                        editar_id=int(input("Ingrese el ID a editar, 0 para salir :"))
+                        if editar_id==0:
+                            print("volviendo al menu principal de categoria.")
+                            break
+                        editando_id=self.categoria.buscar_categoria(editar_id)
+                        if  editando_id:
+                            break #Si encuentra el ID, Rompemos este bucle y avanza para pedir los datos, sino se esjecuta el else
+                        else:
+                            print(f"El ID {editar_id} no existe en la base de datos intente de nuevo")
+                    except ValueError:
+                        print("El ID debe ser un numero entero")
+                # este es para cuando el usuario escriba 0, vuelva arriba y no me pida editar datos            
+                if editar_id==0:
+                    continue
+
+                while True:
+                    nuevo_nombre=str(input("Nuevo Nombre: ")).strip()
+                    if nuevo_nombre=="":
+                        print("Ela campo no puede estar vacio")
+                        continue
+                    break
+                 # Guardamos los cambios llamando al  metodo de editar
+                if self.categoria.editar_categoria(editar_id,nuevo_nombre):
+                    print("Catalogo editado con exito")
+                else:
+                    print("Error al guardar los cambios")
+
 
             elif opcionMenu =="5":
                 print("eliminar Categoria")
+                while True:
+                    try:
+                        id_eliminar=int(input("Ingrese el ID a eliminar '0' para salir del menu:"))
+                        if id_eliminar==0:
+                            break
+                        eliminando=self.categoria.eliminar_categoria(id_eliminar)
+                        if eliminando:
+                            print("Catagolo eliminado con exito")
+                            break
+                        else:
+                            print(f"No existe ningun catalogo con ese ID {id_eliminar}.Intente de nuevo")
 
+                    except ValueError:
+                        print("Error debe ingresar un numero")
+                        continue
 
             elif opcionMenu =="6":
                 print("Saliendo del menuCrud de Categoria")

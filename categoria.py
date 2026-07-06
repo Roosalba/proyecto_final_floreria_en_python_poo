@@ -53,11 +53,60 @@ class Categoria:
                 resul_categoria = cur.fetchone()
                 return resul_categoria
             except Exception as e:
-                print(f"Error al buscar el id de categoria")
-                return[]
+                print(f"Error al buscar el id de categoria: {e}")
+                return None
+            finally:
+                if cur is not None:
+                    cur.close()
+                db.conexion.close()
+        return None
+
+    def editar_categoria(self,id_categoria,nombre_categoria):
+
+        db=Generico()
+        cur=None
+        if db.conexion.is_connected():
+            try:
+                cur= db.conexion.cursor()
+                cur.execute("UPDATE categoria set nombre_categoria =%s WHERE id_categoria = %s",(nombre_categoria,id_categoria))
+                db.conexion.commit()
+                filas_afectadas = cur.rowcount
+                if filas_afectadas>0:
+                    return True
+                else:
+                    return False
+            except Exception as e:
+                print(f"Error al Editar : {e}" )
+                return False
+        
             finally:
                 if cur is not None:
                     cur.close()
                 db.conexion.close()
 
-            
+        return False
+    
+    def eliminar_categoria(self,id_categoria):
+        db=Generico()
+        cur=None
+        if db.conexion.is_connected():
+            try:
+                cur= db.conexion.cursor()
+                cur.execute("DELETE FROM categoria WHERE id_categoria =%s",(id_categoria,))
+                db.conexion.commit()
+                filas_afectadas = cur.rowcount # sirve para contar las filas que fueron modificadas
+                if filas_afectadas >0:
+                    return True
+                else:
+                    return False
+                
+            except Exception as e:
+                print(f"Error al eliminar {e}")
+                return False
+            finally:# es para cerrra la conexion
+                if not None:# comprueba que el cursor realmente exista antes de cerrarlo
+                    cur.close()
+                db.conexion.close()
+        return  False
+
+                
