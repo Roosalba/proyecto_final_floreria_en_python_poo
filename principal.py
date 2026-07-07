@@ -297,6 +297,7 @@ class Principal:
                             print(f"El ID {editar_id} no existe en la base de datos intente de nuevo")
                     except ValueError:
                         print("El ID debe ser un numero entero")
+                        continue
                 # este es para cuando el usuario escriba 0, vuelva arriba y no me pida editar datos            
                 if editar_id==0:
                     continue
@@ -387,19 +388,106 @@ class Principal:
             elif opcionMenu =="1":
                 print("Ingresar Metedo de Pago")
 
+                while True:
+                    nombre_metodo=str(input("Ingrese el metodo de pago: ")).strip()
+                    if nombre_metodo=="":
+                        print("El campo no puede estar vacio ")
+                        continue
+                    break
+                exito=self.metodo_pago.registrar_metedo_pago(nombre_metodo)
+
+                if exito:
+                    print("el metodo de pago fue registrado con existo")
+                    
+                else:
+                    print("Hubo un error al registrar el metodo de pago")
+
+
             elif opcionMenu =="2":
                 print("Listar Metodo de Pago ")
+                lista=self.metodo_pago.listar_metodo_pago()
+
+                if not lista:
+                    print("No hay metodo de pago para mostrar")
+                else:
+                    #Recorremos la lista de metodos pago
+                    for pago in lista:
+                       print(f"ID:{pago[0]} | METODO_PAGO:{pago[1]} ")
+
 
 
             elif opcionMenu =="3":
                 print("Buscar Metodo de pago")
+                while True:
+                    try:
+                        buscar_id=int(input("Ingrese el id a buscar, '0' para salir: "))
+                        if buscar_id==0:
+                            print("volviendo al menu principal.")
+                            break
+                        buscando_id=self.metodo_pago.buscar_metodo_pago(buscar_id)
+                        if not buscando_id:
+                            print("No se encontro el metodo de pago con ese ID.")
+                        else:
+                            print(f"ID:{buscando_id[0]} | METODO_PAGO:{buscando_id[1]}")
+                            
+                    except ValueError:
+                        print("Debe ingresar un numero ")
 
             
             elif opcionMenu =="4":
                 print("Editar Metodo de pago ")
 
+                while True:
+                    try:
+                        editar_id=int(input("Ingrese el ID a editar, 0 para salir :"))
+                        if editar_id==0:
+                            print("volviendo al menu principal de metodo pago.")
+                            break
+                        editando_id=self.metodo_pago.buscar_metodo_pago(editar_id)
+                        if editando_id:
+                            break #Si encuentra el ID, Rompemos este bucle y avanza para pedir los datos, sino se esjecuta el else
+                        else:
+                            print(f"El ID {editar_id} no existe en la base de datos intente de nuevo")
+                            continue
+                    except ValueError:
+                        print("El ID debe ser un numero entero")
+                        continue
+                # este es para cuando el usuario escriba 0, vuelva arriba y no me pida editar datos            
+                if editar_id==0:
+                    continue
+
+                while True:
+                    nuevo_metodo_pago=str(input("Nuevo Metodo_pago: ")).strip()
+                    if nuevo_metodo_pago=="":
+                        print("Ela campo no puede estar vacio")
+                        continue
+                    break
+                    # Guardamos los cambios llamando al  metodo de editar
+                if self.metodo_pago.editar_metodo_pago(editar_id,nuevo_metodo_pago):
+                    print("Metodo de pago editado con exito")
+                else:
+                    print("Error al guardar los cambios")
+                
+
             elif opcionMenu =="5":
                 print("eliminar Metodo de pago")
+                while True:
+                    try:
+                        id_eliminar=int(input("Ingrese el ID a eliminar '0' para salir del menu:"))
+                        if id_eliminar==0:
+                            break
+                        eliminando=self.metodo_pago.eliminar_metodo_pago(id_eliminar)
+                        if eliminando:
+                            print("metodo de pago eliminado con exito")
+                            break
+                        else:
+                            print(f"No existe ningun metodo de pago con ese ID {id_eliminar}.Intente de nuevo")
+
+                    except ValueError:
+                        print("Error debe ingresar un numero")
+                        continue
+
+
 
 
             elif opcionMenu =="6":
@@ -423,6 +511,42 @@ class Principal:
 
             elif opcionMenu =="1":
                 print("Ingresar Clientes")
+                while True:
+                    try:
+                        id_cliente=int(input("Ingrese el ID del cliente: "))
+                        verificar=self.clientes.buscar_clientes(id_cliente)
+                        if verificar:
+                            print("El cliente ya existe. Intente nuevamente")
+                            continue
+                        else:
+                            break
+                    except ValueError:
+                        print("Error: El ID debe ser un numero entero.")
+                        continue
+                # ingresamos los datos despues de validar el ID
+                while True:
+                    nombre=str(input("Ingrese el nombre del cliente: ")).strip()
+                    if nombre=="":
+                        print("El campo no puede estar vacio")
+                        continue
+                    break
+                while True:
+                    telefono=str(input("Ingrese el numero de telefono: ")).strip()
+                    if telefono=="":
+                        print("El campo no puede estar vacio.")
+                        continue
+                    break
+                while True:
+                    email=str(input("Ingrese el correo: ")).strip()
+                    if email=="":
+                        print("El campo no puede estar vacio.")
+                        continue
+                    break
+                if self.clientes.agregar_clientes(id_cliente,nombre,telefono,email):
+                    print("Cliente registrado con exito.")
+                else:
+                    print("Error al agregar al cliente en la base de datos")
+                    
 
             elif opcionMenu =="2":
                 print("Listar Clientes")
@@ -430,7 +554,7 @@ class Principal:
                 # validamos
                 if not lista:
                     print("No hay Clientes")
-                    return
+                    continue
                 else:
                     for clientes in lista:
                      print(f"ID: {clientes[0]}, NOMBRE: {clientes[1]}, TELEFONO: {clientes[2]}, EMAIL: {clientes[3]} ")
@@ -439,13 +563,86 @@ class Principal:
 
             elif opcionMenu =="3":
                 print("Buscar Clientes ")
+                while True:
+                    try:
+                        buscar_id=int(input("Ingrese el id a buscar, '0' para salir: "))
+                        if buscar_id==0:
+                            print("volviendo al menu principal.")
+                            break
+                        buscando_id=self.clientes.buscar_clientes(buscar_id)
+                        if not buscando_id:
+                            print("No se encontro el cliente con ese ID.")
+                        else:
+                            print(f"ID:{buscando_id[0]} | NOMBRE:{buscando_id[1]} | TELEFONO:{buscando_id[2]} | EMAIL:{buscando_id[3]}")
+                            
+                    except ValueError:
+                        print("Debe ingresar un numero ")
+
 
             
             elif opcionMenu =="4":
                 print("Editar Clientes")
 
+                while True:
+                    try:
+                        id_editar=int(input("Ingrese el ID a editar, 0 para volver al menu de proveedores: "))
+                        if id_editar==0:
+                            print("Volviendo al menu de clientes..")
+                            break
+                        editando_id=self.clientes.buscar_clientes(id_editar)
+                        if editando_id:
+
+                            break
+                        else:
+                            print(f"El ID: {id_editar} no se encontro")
+                    except ValueError:
+                        print("El ID debe ser un numero entero")
+                            
+                if id_editar==0:
+                    continue
+                   
+                while True:
+                    nuevo_nombre=str(input("Nuevo Nombre: ")).strip()
+                    if nuevo_nombre=="":
+                        print("Ela campo no puede estar vacio")
+                        continue
+                    break
+                while True:
+                    nuevo_telefono=str(input("Nuevo telefono: ")).strip()
+                    if nuevo_telefono=="":
+                        print("El campo no puede estar vacio")
+                        continue
+                    break
+                        # Guardamos los cambios llamando al  metodo de editar
+
+                while True:
+                    nuevo_email=str(input("Nuevo Email: ")).strip()
+                    if nuevo_email=="":
+                        print("El campo no puede estar vacio.")
+                        continue
+                    break
+                if self.clientes.editar_clientes(id_editar,nuevo_nombre,nuevo_telefono,nuevo_email):
+                    print("Clientes editado con exito")
+                else:
+                    print("Error al guardar los cambios")
+
             elif opcionMenu =="5":
                 print("eliminar Clientes ")
+                while True:
+                    try:
+                        id_eliminar=int(input("Ingrese el ID a eliminar '0' para salir del menu:"))
+                        if id_eliminar==0:
+                            break
+                        eliminando=self.clientes.eliminar_cliente(id_eliminar)
+                        if eliminando:
+                            print("El cliente fue eliminado con exito")
+                            break
+                        else:
+                            print(f"No existe ningun cliente con ese ID {id_eliminar}.Intente de nuevo")
+
+                    except ValueError:
+                        print("Error debe ingresar un numero")
+                        continue
 
 
             elif opcionMenu =="6":

@@ -21,6 +21,7 @@ class Categoria:
             finally:# es para que la conexion se cierre si o si
                 cur.close()
                 db.conexion.close()
+        return False
 
 
     def listar_categoria(self):
