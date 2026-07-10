@@ -20,14 +20,15 @@ class Principal:
 
 
     def menu_tabla(self):
-        print("1. Proveedores   ")
-        print("2. Categoria     ")
-        print("3. Articulos     ")
-        print("4. Metodo_pago   ")
-        print("5. Clientes      ")
-        print("6. ventas        ")
-        print("7. Detalle_venta ")
-        print("8. salir         ")
+        print("--EJECUTAR TABLAS--")
+        print("1. Proveedores     ")
+        print("2. Categoria       ")
+        print("3. Articulos       ")
+        print("4. Metodo_pago     ")
+        print("5. Clientes        ")
+        print("6. ventas          ")
+        print("7. Detalle_venta   ")
+        print("8. salir           ")
 
     def ejecutar_tablas(self):
         while True:
@@ -37,7 +38,6 @@ class Principal:
             if opcion_tabla =="":
                 print("El campo no puede estar vacio")
                 continue
-
 
             elif opcion_tabla =="1":
                 print("Ingresate a la tabla Proveedores ")
@@ -51,8 +51,6 @@ class Principal:
             elif opcion_tabla =="3":
                print("Ingresate a la tabla Articulos ")
                self.ejecutar_articulos()
-
-             
 
 
             elif opcion_tabla =="4":
@@ -69,15 +67,9 @@ class Principal:
                  print("Ingresate a la tabla Ventas ")
                  self.ejecutar_ventas()
 
-
-
             elif opcion_tabla =="7":
                  print("Ingresate a la tabla Detalle_ventas ")
                  self.ejecutar_detalle_ventas()
-
-
-            
-
 
             elif opcion_tabla =="8":
                 print("Saliendo del menu de tablas")
@@ -87,14 +79,13 @@ class Principal:
                 print("Opcion incorrecta")
 
     def menuCrud(self):
+        print("LISTADO DE OPCIONES")
         print("1.Ingresar ")
         print("2.Listar ")
         print("3.Buscar ")
         print("4.Editar ")
         print("5.Borrar ")
         print("6.Salir")
-
-
 
     def ejecutar_proveedor(self):
         while True:
@@ -353,20 +344,204 @@ class Principal:
 
             elif opcionMenu =="1":
                 print("Ingresar Articulos ")
+                while True:
+                    try:
+                        id_proveedor=int(input("Ingrese el ID del proveedor: "))
+                        buscar_id_proveedor=self.proveedores.buscar_por_id(id_proveedor)
+                        if buscar_id_proveedor is None:
+                            print(f"Error: El proveedor con ID {id_proveedor} no existe ")
+                            break
+                     
+                        id_categoria=int(input("Ingrese el ID de categoria: "))
+                        buscar_id_categoria=self.categoria.buscar_categoria(id_categoria)
+                        if buscar_id_categoria is None:# validamos si existe el id de categoria
+                            print(f"Error: La categoria con ID {id_categoria} no existe ")
+                            break
+
+
+                        while True:
+                            nombre=str(input("Ingrese el nombre del articulo: ")).strip()
+                            if nombre=="":
+                                print("El campo no puede estar vacio")
+                                continue
+                            break
+                        while True:
+                            try:
+                                precio=float(input("Ingrese el precio del articulo: "))
+                                if precio <= 0:
+                                    print("El precio debe ser un numero positivo")
+                                    continue
+                                break
+                            except ValueError:
+                                print("Error: el precio debe ser un numero decimal")
+                        while True:
+                            try:
+                                stock=int(input("Ingrese el stock del artiulo: "))
+                                if stock <= 0:
+                                    print("El stock debe ser mayor a cero")
+                                    continue
+                                break
+                            except ValueError:
+                                print("Error: el precio debe ser un numero entero")
+                    
+                        self.articulos.agregar_articulos(nombre,precio,stock,id_proveedor,id_categoria)
+                        print("Articulo guardado con exito")
+                        break
+                    except ValueError:
+                        print("Error: el precio debe ser un numero entero")
+                
+               
+
 
             elif opcionMenu =="2":
                 print("Listar Articulos ")
+                lista=self.articulos.listar_articulos()
+
+                if not lista:
+                    print("No hay ARTICULOS para mostrar")
+                else:
+                    #Recorremos la lista ARTICULOS
+                    for articulo in lista:
+                       print(f"ID:{articulo[0]} | NOMBRE:{articulo[1]}  | PRECIO:{articulo[2]} | STOCK:{articulo[3]} | ID_PROVEEDOR:{articulo[4]} | ID_CATEGORIA:{articulo[5]}")
 
 
             elif opcionMenu =="3":
                 print("Buscar Articulos ")
+                while True:
+                    try:
+                        buscar_id=int(input("Ingrese el id a buscar, '0' para salir: "))
+                        if buscar_id==0:
+                            print("volviendo al menu principal.")
+                            break
+                        buscando_id=self.articulos.buscar_articulos(buscar_id)
+                        if not buscando_id:
+                            print("No se encontro el articulo con ese ID.")
+                        else:
+                            print(f"ID: {buscando_id[0]} | NOMBRE: {buscando_id[1]} | PRECIO: {buscando_id[2]} | STOCK: {buscando_id[3]} | ID_PROVEEDOR: {buscando_id[4]} | ID_CATEGORIA: {buscando_id[5]}")
+                            
+                    except ValueError:
+                        print("Debe ingresar un numero ")
 
             
             elif opcionMenu =="4":
                 print("Editar Articulos")
+            # 1. VALIDAR ID DEL ARTÍCULO
+                while True:
+                    try:
+                        id_editar = int(input("Ingrese el ID a editar o 0 para salir: "))
+                        if id_editar == 0:
+                            print("Operación cancelada.")
+                            break
+                        
+                        buscando_id = self.articulos.buscar_articulos(id_editar)
+                        if buscando_id is None:
+                            print(f"Error: El ID {id_editar} no existe en la base de datos. Intente nuevamente.")
+                            continue
+                        
+                        break # ID válido y existe, salimos de este bucle
+                    except ValueError:
+                        print("Error: El ID debe ser un número entero.")
+                        continue
+
+                if id_editar == 0:
+                    continue # Vuelve al menú principal si el usuario canceló
+
+                # 2. VALIDAR ID DEL PROVEEDOR
+                while True:
+                    try:
+                        id_proveedor = int(input("Ingrese el ID del proveedor o presione '0' para volver al menú principal: "))
+                        if id_proveedor == 0:
+                            print("Operación cancelada.")
+                            break
+                            
+                        buscar_id_proveedor = self.proveedores.buscar_por_id(id_proveedor)
+                        if buscar_id_proveedor is None:
+                            print(f"Error: El proveedor con ID {id_proveedor} no existe.")
+                            continue
+                            
+                        break # Proveedor válido, salimos del bucle
+                    except ValueError:
+                        print("Error: El ID del proveedor debe ser un número entero.")
+
+                if id_proveedor == 0:
+                    continue
+
+                # 3. VALIDAR ID DE CATEGORÍA
+                while True:
+                    try:
+                        id_categoria = int(input("Ingrese el ID de categoría o presione '0' para volver al menú principal: "))
+                        if id_categoria == 0:
+                            print("Operación cancelada.")
+                            break
+                            
+                        buscar_id_categoria = self.categoria.buscar_categoria(id_categoria)
+                        if buscar_id_categoria is None:
+                            print(f"Error: La categoría con ID {id_categoria} no existe.")
+                            continue
+                            
+                        break # Categoría válida, salimos del bucle
+                    except ValueError:
+                        print("Error: El ID de la categoría debe ser un número entero.")
+
+                if id_categoria == 0:
+                    continue         
+
+                # 4. PEDIR NUEVO NOMBRE
+                while True:
+                    nuevo_nombre = str(input("Ingrese el nombre del artículo: ")).strip()
+                    if nuevo_nombre == "":
+                        print("El campo no puede estar vacío.")
+                        continue
+                    break
+
+                # 5. PEDIR NUEVO PRECIO
+                while True:
+                    try:
+                        nuevo_precio = float(input("Ingrese el precio del artículo: "))
+                        if nuevo_precio <= 0:
+                            print("El precio debe ser un número positivo.")
+                            continue
+                        break
+                    except ValueError:
+                        print("Error: el precio debe ser un número decimal.")
+
+                # 6. PEDIR NUEVO STOCK
+                while True:
+                    try:
+                        nuevo_stock = int(input("Ingrese el stock del artículo: "))
+                        if nuevo_stock < 0:
+                            print("El stock debe ser mayor o igual a cero.")
+                            continue
+                        break
+                    except ValueError:
+                        print("Error: el stock debe ser un número entero.")
+
+                # 7. GUARDAR CAMBIOS EN LA BASE DE DATOS
+                resultado = self.articulos.editar_articulos(id_editar, nuevo_nombre, nuevo_precio, nuevo_stock, id_proveedor, id_categoria)
+                
+                if resultado:
+                    print("¡Artículo editado con éxito!")
+                else:
+                    print("No se pudo editar el artículo (Verificá si hubo cambios o errores en la base de datos).")
+                                
 
             elif opcionMenu =="5":
                 print("eliminar Articulos ")
+                while True:
+                    try:
+                        id_eliminar=int(input("Ingrese el ID a eliminar '0' para salir del menu:"))
+                        if id_eliminar==0:
+                            break
+                        eliminando=self.articulos.eliminar_articulos(id_eliminar)
+                        if eliminando:
+                            print("Articulo eliminado con exito")
+                            break
+                        else:
+                            print(f"No existe ningun ARTICULO con ese ID {id_eliminar}.Intente de nuevo")
+
+                    except ValueError:
+                        print("Error debe ingresar un numero")
+                        continue
 
 
             elif opcionMenu =="6":
@@ -621,6 +796,7 @@ class Principal:
                         print("El campo no puede estar vacio.")
                         continue
                     break
+                #lo hice directo sin crear la variable
                 if self.clientes.editar_clientes(id_editar,nuevo_nombre,nuevo_telefono,nuevo_email):
                     print("Clientes editado con exito")
                 else:
@@ -665,13 +841,102 @@ class Principal:
 
             elif opcionMenu =="1":
                 print("Ingresar Ventas")
+                # 1. VALIDAR ID DEL CLIENTE
+                while True:
+                    try:
+                        id_cliente=int(input("Ingrese el ID del cliente (o 0 para cancelar): "))
+                        if id_cliente==0:
+                            print("Operacion cancelada.")
+                            break
+                        # buscamos y validamos el id del cliente, sino existe nos pide nuevamante
+                        buscar_id_cliente=self.clientes.buscar_clientes(id_cliente)
+                        if not buscar_id_cliente:
+                            print(f"Error: El cliente con ID {id_cliente} no existe. Intente nuevamente.")
+                            continue
+                        else:
+                            break # si el ID existe, sale de este bucle
+                    except ValueError:
+                        print("Error: El ID debe ser un numero entero.")
+                        continue
+
+                if id_cliente==0:
+                    continue # este lo coloco aca, para tener la opcion de volver al menu principal de ventas
+
+
+                # 2. VALIDAR ID DEL MÉTODO DE PAGO
+                while True:
+                   try:
+                       id_metodo_pago=int(input("Ingrese el ID del metodo de pago (o 0 para salir):"))
+                       if id_metodo_pago==0:
+                           print("Operacion cancelada")
+                           break
+                       #si no existe en la bases de datos, da error y pide nuevamnete
+                       buscar_id_metodo=self.metodo_pago.buscar_metodo_pago(id_metodo_pago)
+                       if not buscar_id_metodo:
+                            print(f"Error: El método de pago con ID {id_metodo_pago} no existe. Intente nuevamente.")
+                            continue
+                       break
+                   except ValueError:
+                         print("Error: El ID debe ser un número entero.")
+
+                if id_metodo_pago == 0:
+                    continue # Nos saca al menú principal si canceló 
+
+                # 3. PEDIR EL TOTAL DE LA VENTA 
+                while True:
+                    try:
+                        total_venta = float(input("Ingrese el total de la venta: "))
+                        if total_venta <= 0:
+                            print("El precio debe ser un número positivo.")
+                            continue
+                        break
+                    except ValueError:
+                        print("Error: El total debe ser un número decimal.")
+
+                # 4. GUARDAR EN LA BASE DE DATOS
+                id_venta_generada = self.ventas.agregar_ventas(total_venta, id_cliente, id_metodo_pago)
+                
+                if id_venta_generada:
+                    print(f"¡Venta registrada con éxito! ID asignado: {id_venta_generada}")
+                else:
+                    print("Error: No se pudo registrar la venta.")
+
+
+                            
 
             elif opcionMenu =="2":
                 print("Listar Ventas ")
+                lista=self.ventas.listar_ventas() # guardamos en la variable lista lo que retornamos
+                # validamos
+                if not lista:
+                    print("No hay ventas")
+                    continue
+                else:
+                    for venta in lista:
+                     print(f"ID: {venta[0]}, FECHA: {venta[1]}, TOTAL: {venta[2]}, ID_CLIENTE: {venta[3]},  ID_METODO_PAGO: {venta[4]} ")
+
+
 
 
             elif opcionMenu =="3":
                 print("Buscar Ventas ")
+                while True:
+                    try:
+                        buscar_id=int(input("Ingrese el id a buscar, '0' para salir: "))
+                        if buscar_id==0:
+                            print("volviendo al menu principal ve ventas.")
+                            break
+                    
+                        buscando_id=self.ventas.buscar_venta(buscar_id)
+                        if not buscando_id:
+                            print("No se encontra la venta con ese ID.")
+                            continue
+                        else:
+                            print(f"ID:{buscando_id[0]} | FECHA:{buscando_id[1]} | TOTAL:{buscando_id[2]} | ID_CLIENTE:{buscando_id[3]} | ID_METODO_PAGO:{buscando_id[4]} ")
+                            break      
+                    except ValueError:
+                        print("Debe ingresar un numero ")
+                        continue
 
             
             elif opcionMenu =="4":
@@ -679,6 +944,22 @@ class Principal:
 
             elif opcionMenu =="5":
                 print("eliminar Ventas ")
+                while True:
+                    try:
+                        id_eliminar=int(input("Ingrese el ID a eliminar '0' para salir del menu:"))
+                        if id_eliminar==0:
+                            break
+                        eliminando=self.ventas.eliminar_venta(id_eliminar)
+                        if eliminando:
+                            print("la venta fue eliminado con exito")
+                            break
+                        else:
+                            print(f"No existe ninguna venta con ese ID {id_eliminar}.Intente de nuevo")
+
+                    except ValueError:
+                        print("Error debe ingresar un numero")
+                        continue
+
 
 
             elif opcionMenu =="6":

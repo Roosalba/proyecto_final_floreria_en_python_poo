@@ -94,26 +94,26 @@ class Proveedores:
 
 
     def eliminar_proveedor(self,id_proveedor):
-            db=Generico()
-            cur=None
-            if db.conexion.is_connected():
-                try:
-                    cur=db.conexion.cursor()
-                    cur.execute("DELETE FROM proveedores WHERE id_proveedor = %s",(id_proveedor,))
-                    db.conexion.commit()
-                    filas_afectadas = cur.rowcount
-                    if filas_afectadas>0:
-                        return True
-                    else:
-                        return False
-                except Exception as e:
-                    print(f"Error al eliminar el proveedor {e}")
+        db=Generico()
+        cur=None
+        if db.conexion.is_connected():
+            try:
+                cur=db.conexion.cursor()
+                cur.execute("DELETE FROM proveedores WHERE id_proveedor = %s",(id_proveedor,))
+                db.conexion.commit()
+                filas_afectadas = cur.rowcount
+                if filas_afectadas>0:
+                    return True
+                else:
                     return False
-                finally:
-                    if cur is not None:
-                        cur.close()
-                    db.conexion.close()
-            return False
+            except Exception as e:
+                print(f"Error al eliminar el proveedor {e}")
+                return False
+            finally:
+                if cur is not None:
+                    cur.close()
+                db.conexion.close()
+        return False
     
             
     def editar_proveedor(self,nombre_empresa,telefono,id_proveedor):

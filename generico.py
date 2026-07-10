@@ -6,10 +6,12 @@ class Generico():
         try:
             self.conexion=mysql.connector.connect(
                 host = 'localhost',
-                port = 3307,
+                port = 3306,
                 user = 'root',
                 password = '', 
-                database='floreria'
+                database='florerias',
+                autocommit=True
+                
             )
 
         except Error as error:
