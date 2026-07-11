@@ -1292,6 +1292,11 @@ class Principal:
             else:
 
                 print("Opcion incorrecta")
+
+'''   
+ESTO LO COMENTO PORQUE VOY A USAR EL ARCHIVO INTERFAZ MENU PARA INTERACTUAR
+CON EL MENU           
 if __name__ == "__main__":
     principal=Principal()
     principal.ejecutar_tablas()
+    '''
