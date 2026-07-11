@@ -344,52 +344,81 @@ class Principal:
 
             elif opcionMenu =="1":
                 print("Ingresar Articulos ")
+                # 1. VALIDAMOS EL ID DE PROVEEDORES
                 while True:
                     try:
                         id_proveedor=int(input("Ingrese el ID del proveedor: "))
+                        if id_proveedor==0:
+                            print("Operacion cancelada.")
+                            break
+
                         buscar_id_proveedor=self.proveedores.buscar_por_id(id_proveedor)
                         if buscar_id_proveedor is None:
-                            print(f"Error: El proveedor con ID {id_proveedor} no existe ")
-                            break
-                     
+                            print(f"Error: El proveedor con ID {id_proveedor} no existe.Intente nuevamente ")
+                            continue
+                        break
+                    except ValueError:
+                        print("Error: El ID debe ser un numero entero.")
+                
+                    if id_proveedor==0:
+                        continue # regresa al  menu de opciones
+                     # 2. VALIDAMOS EL ID DE CATEGORIA
+
+                while True:               
+                    try:
                         id_categoria=int(input("Ingrese el ID de categoria: "))
+                        if id_categoria==0:
+                            print("Operacion cancelada.")
+                            break
+
                         buscar_id_categoria=self.categoria.buscar_categoria(id_categoria)
                         if buscar_id_categoria is None:# validamos si existe el id de categoria
                             print(f"Error: La categoria con ID {id_categoria} no existe ")
-                            break
-
-
-                        while True:
-                            nombre=str(input("Ingrese el nombre del articulo: ")).strip()
-                            if nombre=="":
-                                print("El campo no puede estar vacio")
-                                continue
-                            break
-                        while True:
-                            try:
-                                precio=float(input("Ingrese el precio del articulo: "))
-                                if precio <= 0:
-                                    print("El precio debe ser un numero positivo")
-                                    continue
-                                break
-                            except ValueError:
-                                print("Error: el precio debe ser un numero decimal")
-                        while True:
-                            try:
-                                stock=int(input("Ingrese el stock del artiulo: "))
-                                if stock <= 0:
-                                    print("El stock debe ser mayor a cero")
-                                    continue
-                                break
-                            except ValueError:
-                                print("Error: el precio debe ser un numero entero")
-                    
-                        self.articulos.agregar_articulos(nombre,precio,stock,id_proveedor,id_categoria)
-                        print("Articulo guardado con exito")
+                            continue
                         break
                     except ValueError:
-                        print("Error: el precio debe ser un numero entero")
-                
+                        print("Error: El ID debe ser un numero entero.")
+
+                    if id_categoria==0:
+                        continue
+
+                # 3. PEDIR EL NOMBRE DEL ARTÍCULO
+                while True:
+                    nombre=str(input("Ingrese el nombre del articulo: ")).strip()
+                    if nombre=="":
+                        print("El campo no puede estar vacio")
+                        continue
+                    break
+
+                    # 4. PEDIR EL PRECIO DEL ARTÍCULO
+                while True:
+                        try:
+                            precio=float(input("Ingrese el precio del articulo: "))
+                            if precio <= 0:
+                                print("El precio debe ser un numero positivo")
+                                continue
+                            break
+                        except ValueError:
+                            print("Error: el precio debe ser un numero decimal")
+
+                   # 4. PEDIR EL STOC DEL ARTÍCULO         
+                while True:
+                        try:
+                            stock=int(input("Ingrese el stock del artiulo: "))
+                            if stock <= 0:
+                                print("El stock debe ser mayor a cero")
+                                continue
+                            break
+                        except ValueError:
+                            print("Error: el precio debe ser un numero entero")
+
+                # 5. GUARDAR EN LA BASE DE DATOS
+                resultado=self.articulos.agregar_articulos(nombre,precio,stock,id_proveedor,id_categoria)
+                if resultado: 
+                        print("Articulo guardado con exito")
+                else:
+                    print("Error: No se pudo guardar el articulo en la base de datos")
+                   
                
 
 
@@ -882,22 +911,15 @@ class Principal:
                 if id_metodo_pago == 0:
                     continue # Nos saca al menú principal si canceló 
 
-                # 3. PEDIR EL TOTAL DE LA VENTA 
-                while True:
-                    try:
-                        total_venta = float(input("Ingrese el total de la venta: "))
-                        if total_venta <= 0:
-                            print("El precio debe ser un número positivo.")
-                            continue
-                        break
-                    except ValueError:
-                        print("Error: El total debe ser un número decimal.")
-
+                # 3. EL TOTAL DE LA VENTA LO DEJO EN 0
+                total_venta=0.0
+                print(f"Generando factura con total inicial: ${total_venta}")
                 # 4. GUARDAR EN LA BASE DE DATOS
                 id_venta_generada = self.ventas.agregar_ventas(total_venta, id_cliente, id_metodo_pago)
                 
                 if id_venta_generada:
                     print(f"¡Venta registrada con éxito! ID asignado: {id_venta_generada}")
+                    print("RECUERDE: Ahora vaya al menu de 'Detalle_venta' para cargar los articulos de esta venta.")
                 else:
                     print("Error: No se pudo registrar la venta.")
 
@@ -941,6 +963,75 @@ class Principal:
             
             elif opcionMenu =="4":
                 print("Editar Ventas")
+                # 1. VALIDAMOS EL ID DE VENTAS
+                while True:
+                    try:
+                        id_editar = int(input("Ingrese el ID a editar o 0 para salir: "))
+                        if id_editar == 0:
+                            print("Operación cancelada.")
+                            break
+                        
+                        buscando_id = self.ventas.buscar_venta(id_editar)
+                        if buscando_id is None:
+                            print(f"Error: El ID {id_editar} no existe en la base de datos. Intente nuevamente.")
+                            continue
+                        
+                        break # ID válido y existe, salimos de este bucle
+                    except ValueError:
+                        print("Error: El ID debe ser un número entero.")
+                        continue
+
+                if id_editar == 0:
+                    continue # Vuelve al menú principal si el usuario canceló
+
+                # 2. VALIDAR ID DEL CLIENTE
+                while True:
+                    try:
+                        id_cliente = int(input("Ingrese el ID del cliente o presione '0' para volver al menú principal: "))
+                        if id_cliente == 0:
+                            print("Operación cancelada.")
+                            break
+                            
+                        buscar_id_cliente = self.clientes.buscar_clientes(id_cliente)
+                        if buscar_id_cliente is None:
+                            print(f"Error: El cliente con ID {id_cliente} no existe.")
+                            continue
+                            
+                        break # Proveedor válido, salimos del bucle
+                    except ValueError:
+                        print("Error: El ID del cliente debe ser un número entero.")
+
+                if id_cliente == 0:
+                    continue
+
+                # 3. VALIDAR ID DEL METODO DE PAGO
+                while True:
+                    try:
+                        id_metodo_pago = int(input("Ingrese el ID del metodo de pago o presione '0' para volver al menú principal: "))
+                        if id_metodo_pago == 0:
+                            print("Operación cancelada.")
+                            break
+                            
+                        buscar_id_metodo_pago = self.metodo_pago.buscar_metodo_pago(id_metodo_pago)
+                        if buscar_id_metodo_pago is None:
+                            print(f"Error: El metodo de pago con ID {id_metodo_pago} no existe.")
+                            continue
+                            
+                        break # metodo de pago válida, salimos del bucle
+                    except ValueError:
+                        print("Error: El ID de la categoría debe ser un número entero.")
+
+                if id_metodo_pago == 0:
+                    continue         
+
+               
+                # 5. GUARDAR CAMBIOS EN LA BASE DE DATOS
+                resultado = self.ventas.editar_venta(id_editar,id_cliente,id_metodo_pago)
+                if resultado:
+                    print("¡venta editada con éxito!")
+                else:
+                    print("No se pudo editar la venta (Verificá si hubo cambios o errores en la base de datos).")
+                                
 
             elif opcionMenu =="5":
                 print("eliminar Ventas ")
@@ -980,25 +1071,223 @@ class Principal:
                 continue
 
             elif opcionMenu =="1":
-                print("Ingresar ")
+                print("Ingresar detalle ventas ")
+
+                # 1.VALIDAR EL ID DEL ARTICULO
+                while True:
+                    try:
+                        id_articulo=int(input("Ingrese el ID del articulo (o 0 para cancelar): "))
+                        if id_articulo==0:
+                            print("Operacion cancelada.")
+                            break
+                        # buscamos y validamos el id del articulo, sino existe nos pide nuevamante
+                        buscar_id_articulo=self.articulos.buscar_articulos(id_articulo)
+                        if not buscar_id_articulo:
+                            print(f"Error: El articulo con ID {id_articulo} no existe. Intente nuevamente.")
+                            continue
+                        else:
+                            #Me trae el precio del ariculo mediante su indice, para hacer el subtotal
+                            precio_articulo=buscar_id_articulo[2]
+                            stock_disponible=buscar_id_articulo[3]
+                            break # si el ID existe, sale de este bucle
+                    except ValueError:
+                        print("Error: El ID debe ser un numero entero.")
+                        continue
+
+                if id_articulo==0:
+                    continue # este lo coloco aca, para tener la opcion de volver al menu principal de ventas
+
+
+                # 2. VALIDAR ID DE LA VENTA
+                while True:
+                   try:
+                       id_venta=int(input("Ingrese el ID  de la venta (o 0 para salir):"))
+                       if id_venta==0:
+                           print("Operacion cancelada")
+                           break
+                       #si no existe en la bases de datos, da error y pide nuevamnete
+                       buscar_id_metodo=self.ventas.buscar_venta(id_venta)
+                       if not buscar_id_metodo:
+                            print(f"Error: La venta con ID {id_venta} no existe. Intente nuevamente.")
+                            continue
+                       break
+                   except ValueError:
+                         print("Error: El ID debe ser un número entero.")
+
+                if id_venta == 0:
+                    continue # Nos saca al menú principal si canceló 
+
+                # 3. PEDIR LA CANTIDAD 
+                while True:
+                    try:
+                        cantidad =int(input("Ingrese la cantidad : "))
+                        if cantidad <= 0:
+                            print("El precio debe ser un número positivo.")
+                            continue
+                        if cantidad > stock_disponible:
+                            print(f"Error: NO hay suficiente stock. Solo quedan {stock_disponible} unidades. Intente nuevamente")
+                            continue
+                        break
+                    except ValueError:
+                        print("Error: La cantidad debe ser un numero entero.")
+
+
+                # 4. CALCULAR EL SUBTOTAL AUTOMÁTICAMENTE 
+                sub_total=cantidad*precio_articulo
+
+
+                # 5. GUARDAR EN LA BASE DE DATOS
+                resultado = self.detalle_venta.agregar_detalle_venta(cantidad,sub_total,id_articulo,id_venta)
+                
+                if resultado:
+                    print(f"¡Detalle de Venta registrada con éxito! ")
+                else:
+                    print("Error: No se pudo registrar la venta.")
+
+
 
             elif opcionMenu =="2":
-                print("Listar ")
+                print("Listar detalle ventas ")
+                lista=self.detalle_venta.listar_detalle_ventas() # guardamos en la variable lista lo que retornamos
+                # validamos
+                if not lista:
+                    print("No hay detalles de ventas para mostrar")
+                    continue
+                else:
+                    for venta in lista:
+                     print(f"ID: {venta[0]}, CANTIDAD: {venta[1]}, SUB_TOTAL: {venta[2]}, ID_ARTICULO: {venta[3]},  ID_VENTA: {venta[4]} ")
+
 
 
             elif opcionMenu =="3":
-                print("Buscar ")
+                print("Buscar detalle ventas")
+                while True:
+                    try:
+                        buscar_id=int(input("Ingrese el id a buscar, '0' para salir: "))
+                        if buscar_id==0:
+                            print("volviendo al menu principal ve ventas.")
+                            break
+                    
+                        buscando_id=self.detalle_venta.buscar_detalle_ventas(buscar_id)
+                        if not buscando_id:
+                            print("No se encontro el detalle de venta con ese ID.")
+                            continue
+                        else:
+                            print(f"ID:{buscando_id[0]} | CANTIDAD:{buscando_id[1]} | SUB_TOTAL:{buscando_id[2]} | ID_ARTICULO:{buscando_id[3]} | ID_VENTA:{buscando_id[4]} ")
+                            break      
+                    except ValueError:
+                        print("Debe ingresar un numero ")
+                        continue
+                
 
             
             elif opcionMenu =="4":
-                print("Editar ")
+                print("Editar detalles ventas ")
+                # 1. VALIDAMOS EL ID DE DETALLE
+                while True:
+                    try:
+                        id_editar = int(input("Ingrese el ID a editar o 0 para salir: "))
+                        if id_editar == 0:
+                            print("Operación cancelada.")
+                            break
+                        
+                        buscando_id = self.detalle_venta.buscar_detalle_ventas(id_editar)
+                        if buscando_id is None:
+                            print(f"Error: El ID {id_editar} no existe en la base de datos. Intente nuevamente.")
+                            continue
+                        
+                        break # ID válido y existe, salimos de este bucle
+                    except ValueError:
+                        print("Error: El ID debe ser un número entero.")
+                        continue
 
+                if id_editar == 0:
+                    continue # Vuelve al menú principal si el usuario canceló
+
+                 # 2. VALIDAR ID DEL ARTICULO
+                while True:
+                    try:
+                        id_articulo = int(input("Ingrese el ID del articulo o presione '0' para volver al menú principal: "))
+                        if id_articulo == 0:
+                            print("Operación cancelada.")
+                            break
+                            
+                        buscar_id_articulo = self.articulos.buscar_articulos(id_articulo)
+                        if buscar_id_articulo is None:
+                            print(f"Error: El articulo con ID {id_articulo} no existe.")
+                            continue
+                            
+                        break # metodo de pago válida, salimos del bucle
+                    except ValueError:
+                        print("Error: El ID del articulo debe ser un número entero.")
+
+                if id_articulo == 0:
+                    continue         
+
+
+                # 3. VALIDAR ID DE LA VENTA
+                while True:
+                    try:
+                        id_venta= int(input("Ingrese el ID de la venta o presione '0' para volver al menú principal: "))
+                        if id_venta == 0:
+                            print("Operación cancelada.")
+                            break
+                            
+                        buscar_id_venta = self.ventas.buscar_venta(id_venta)
+                        if buscar_id_venta is None:
+                            print(f"Error: La venta con ID {id_venta} no existe.")
+                            continue
+                            
+                        break # Proveedor válido, salimos del bucle
+                    except ValueError:
+                        print("Error: El ID de la venta debe ser un número entero.")
+
+                if id_venta == 0:
+                    continue
+
+
+                # 4. SOLICITAR LA NUEVA CANTIDAD (
+                while True:
+                    try:
+                        nueva_cantidad = int(input("Ingrese la nueva cantidad: "))
+                        if nueva_cantidad <= 0:
+                            print("Error: La cantidad debe ser mayor a 0.")
+                            continue
+                        
+                        break # Cantidad valida, salimos del bucle
+                    except ValueError:
+                        print("Error: La cantidad debe ser un número entero.")
+                        
+                # 5. GUARDAR CAMBIOS EN LA BASE DE DATOS
+                resultado = self.detalle_venta.editar_detalle(id_editar,id_articulo,id_venta,nueva_cantidad)
+                if resultado:
+                    print("¡detalle de venta editada con éxito!")
+                else:
+                    print("No se pudo editar el detalle de venta (Verificá si hubo cambios o errores en la base de datos).")
+                                
+
+                
             elif opcionMenu =="5":
-                print("eliminar ")
+                print("eliminar detalle ventas ")
+                while True:
+                    try:
+                        id_eliminar=int(input("Ingrese el ID a eliminar '0' para salir del menu:"))
+                        if id_eliminar==0:
+                            break
+                        eliminando=self.detalle_venta.eliminar_detalle(id_eliminar)
+                        if eliminando:
+                            print("el detalle de venta fue eliminado con exito")
+                            break
+                        else:
+                            print(f"No existe ningun detalle de venta con ese ID {id_eliminar}.Intente de nuevo")
+
+                    except ValueError:
+                        print("Error debe ingresar un numero")
+                        continue
 
 
             elif opcionMenu =="6":
-                print("Saliendo del menuCrud de ")
+                print("Saliendo del menuCrud de detalles de ventas")
                 break
             else:
 

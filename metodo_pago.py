@@ -19,7 +19,8 @@ class Metodo_pago:
                 print(f"Error al registrar en la base de datos: {e}")
                 return False
             finally:# es para que la conexion se cierre si o si
-                cur.close()
+                if cur is not None:
+                    cur.close()
                 db.conexion.close()
         return False
     
@@ -105,7 +106,7 @@ class Metodo_pago:
                 print(f"Error al eliminar {e}")
                 return False
             finally:# es para cerrra la conexion
-                if not None:# comprueba que el cursor realmente exista antes de cerrarlo
+                if cur is not None:# comprueba que el cursor realmente exista antes de cerrarlo
                     cur.close()
                 db.conexion.close()
         return  False

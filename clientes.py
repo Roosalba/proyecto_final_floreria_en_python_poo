@@ -29,7 +29,9 @@ class Cliente:
 
 
     def listar_cliente(self):
+        
         db = Generico() # Este codigo inicializa la conexion a MySQL (host, puerto, usuario)
+        cur=None
         if db.conexion.is_connected(): # Validamos si la conexión con el servidor de MySQL (puerto 3306) 
             try:
                 cur= db.conexion.cursor()#creamos el cursor,que es el objeto que nos permite enviar sentencias sql a la base de datos.
@@ -41,7 +43,8 @@ class Cliente:
                 print(f"No se pudo listar los clientes: {e}")
                 return []# esto si no hay clientes me devuelve una lista vacia
             finally:
-                cur.close()
+                if cur is not None:
+                    cur.close()
                 db.conexion.close()
         return[]
     
@@ -88,7 +91,7 @@ class Cliente:
                 print(f"Error al eliminar {e}")
                 return False
             finally:# es para cerrra la conexion
-                if not None:# comprueba que el cursor realmente exista antes de cerrarlo
+                if cur is not  None:# comprueba que el cursor realmente exista antes de cerrarlo
                     cur.close()
                 db.conexion.close()
         return  False

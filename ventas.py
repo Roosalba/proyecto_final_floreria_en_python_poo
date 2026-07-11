@@ -95,13 +95,14 @@ class Ventas:
                 db.conexion.close()
         return False
     
-    def editar_venta(self,fecha,total,id_cliente,id_metodo_pago):
+    def editar_venta(self,id_venta,id_cliente,id_metodo_pago):
         db=Generico()
         cur=None
+        fecha_automatica = datetime.now()#genero la fecha actual y hora actual automaticamente
         if db.conexion.is_connected():
             try:
                 cur=db.conexion.cursor()
-                cur.execute("UPDATE proveedores set nombre_empresa =%s, telefono =%s WHERE id_proveedor =%s",(nombre_empresa,telefono,id_proveedor))
+                cur.execute("UPDATE ventas set fecha =%s, id_cliente=%s, id_metodo_pago=%s WHERE id_venta =%s",(fecha_automatica,id_cliente,id_metodo_pago,id_venta))
                 db.conexion.commit()
                 filas_afectadas = cur.rowcount
                 if filas_afectadas>0:
@@ -109,10 +110,12 @@ class Ventas:
                 else:
                     return False
             except Exception as e:
-                print(f"Error al editar el proveedor {e}")
+                print(f"Error al editar la venta {e}")
                 return False
             finally:
                 if cur is not None:
                     cur.close()
                 db.conexion.close()
         return False
+    
+   
