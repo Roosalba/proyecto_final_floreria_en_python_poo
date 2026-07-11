@@ -14,6 +14,15 @@ class Detalle_venta:
         if db.conexion.is_connected(): 
             try:
               cur= db.conexion.cursor()
+
+              cur.execute("SELECT stock FROM articulos WHERE id_articulo =%s",(id_articulo,))
+
+              resu_stock = cur.fetchone()
+              if not resu_stock or resu_stock[0]< cantidad:
+                print("Error: El stock cambio o es insuficiente en la bases de datos. ")
+                return
+              
+              # 1.  INSERTAR EL DETALLE
               consulta="INSERT INTO detalle_ventas (cantidad,sub_total,id_articulo,id_venta) VALUES (%s,%s,%s,%s)"
               cur.execute(consulta,(cantidad,sub_total,id_articulo,id_venta,))
 
@@ -25,13 +34,17 @@ class Detalle_venta:
               return True
             except Exception as e:
                 print(f"Error al registrar en la base de datos: {e}")
+                db.conexion.rollback() #  Si falla el UPDATE, deshace el INSERT
                 return False
+            
             finally:# es para que la conexion se cierre si o si
                 if cur is not None:
                     cur.close()
                 db.conexion.close()
         return False 
     
+
+
     def listar_detalle_ventas(self):
         db=Generico()
         cur=None
@@ -115,52 +128,68 @@ class Detalle_venta:
                 
         return False
 
-    def editar_detalle(self,id_detalle,id_articulo_nuevo,id_venta_nueva, nueva_cantidad):
-        db= Generico()
-        cur=None
+    def editar_detalle(self, id_detalle, id_articulo_nuevo, id_venta_nueva, nueva_cantidad):
+        db = Generico()
+        cur = None
 
         if db.conexion.is_connected():
             try:
-                cur=db.conexion.cursor()
-                # 1.BUSCAR PARA SABER QUE HABIA ANTES, LO HACEMOS HACIENDO LA CONSULTA Y LUEGO GUARDAMOS EN LA VARIABLE RESULTADO
-                cur.execute("SELECT id_articulo, cantidad FROM detalle_ventas WHERE id_detalle =%s",(id_detalle,))
-                resultado_viejo=cur.fetchone()
+                cur = db.conexion.cursor()
+                
+                # Paso 1: Buscar el detalle viejo para saber que articulo y cantidad habia antes
+                cur.execute("SELECT id_articulo, cantidad FROM detalle_ventas WHERE id_detalle = %s", (id_detalle,))
+                resultado_viejo = cur.fetchone()
 
                 if not resultado_viejo:
                     print("Error: El ID de detalle no existe")
                     return False
-                id_articulo_viejo= resultado_viejo[0]
-                cantidad_vieja=resultado_viejo[1] #guardo la cantidad vieja
+                
+                id_articulo_viejo = resultado_viejo[0]
+                cantidad_vieja = resultado_viejo[1]
 
-                # 2.BUSCO EL PRECIO DEL NUEVO ARTICULO(ASI CALCULO EL NUEVO SUBTOTAL)
-                cur.execute("SELECT precio FROM articulos WHERE id_articulo =%s",(id_articulo_nuevo,))
+                # Paso 2: Buscar el precio y el stock actual del nuevo articulo elegido
+                cur.execute("SELECT precio, stock FROM articulos WHERE id_articulo = %s", (id_articulo_nuevo,))
                 resultado_articulo = cur.fetchone()
 
                 if not resultado_articulo:
                     print("Error: El nuevo ID articulo no existe")
                     return False
+                
                 precio_articulo = resultado_articulo[0]
+                stock_actual_nuevo = resultado_articulo[1]
                 nuevo_sub_total = nueva_cantidad * precio_articulo
 
-                # 3.DEVUELVO EL ARTICULO VIEJO AL STOCK "LAS FLORES"
-                cur.execute("UPDATE articulos SET stock = stock + %s WHERE id_articulo =%s",(cantidad_vieja,id_articulo_viejo))
+                # Paso 3: Calcular el stock real disponible sumando lo viejo si es el mismo articulo
+                if id_articulo_nuevo == id_articulo_viejo:
+                    stock_efectivo = stock_actual_nuevo + cantidad_vieja
+                else:
+                    stock_efectivo = stock_actual_nuevo
 
+                # Paso 4: Si la nueva cantidad supera ese stock real, frena el proceso
+                if nueva_cantidad > stock_efectivo:
+                    print(f"Error: Stock insuficiente. El stock disponible real para la operacion es {stock_efectivo}.")
+                    return False
 
-                # 4. ACTUALIZAMOS EL DETALLE(cambio todos los campo de la tabla)
-                cur.execute("UPDATE detalle_ventas SET cantidad = %s, sub_total =%s, id_articulo=%s, id_venta=%s WHERE  id_detalle= %s",(nueva_cantidad,nuevo_sub_total,id_articulo_nuevo,id_venta_nueva,id_detalle))
+                # Paso 5: Devolver la cantidad vieja al stock del articulo viejo
+                cur.execute("UPDATE articulos SET stock = stock + %s WHERE id_articulo = %s", (cantidad_vieja, id_articulo_viejo))
 
+                # Paso 6: Actualizar el detalle de la venta con los nuevos datos y el subtotal
+                cur.execute("""
+                    UPDATE detalle_ventas 
+                    SET cantidad = %s, sub_total = %s, id_articulo = %s, id_venta = %s 
+                    WHERE id_detalle = %s
+                """, (nueva_cantidad, nuevo_sub_total, id_articulo_nuevo, id_venta_nueva, id_detalle))
 
-                # 5.RESTO LAS NUEVAS FLOR DEL STOCK
-                cur.execute("UPDATE articulos SET stock = stock - %s WHERE id_articulo = %s",(nueva_cantidad,id_articulo_nuevo))
+                # Paso 7: Restar la nueva cantidad del stock del nuevo articulo
+                cur.execute("UPDATE articulos SET stock = stock - %s WHERE id_articulo = %s", (nueva_cantidad, id_articulo_nuevo))
 
-                #confirmar los cambios
+                # Paso 8: Guardar todos los cambios juntos con commit
                 db.conexion.commit()
                 return True
             except Exception as e:
                 print(f"Error al editar el detalle y ajustar stock: {e}")
-                db.conexion.rollback() 
+                db.conexion.rollback()
                 return False
-                    
             finally:
                 if cur is not None:
                     cur.close()
