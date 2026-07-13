@@ -1,3 +1,4 @@
+from colorama import init,Fore ,Style
 from generico import Generico
 from proveedores import Proveedores
 from metodo_pago import Metodo_pago
@@ -7,6 +8,7 @@ from clientes import Cliente
 from ventas import Ventas
 from detalle_venta import Detalle_venta
 
+init()# Esto es para iniciar el colograma
 class Principal:
     def __init__(self):
         self.generico =Generico()
@@ -20,7 +22,7 @@ class Principal:
 
 
     def menu_tabla(self):
-        print("--EJECUTAR TABLAS--")
+        print(Fore.YELLOW +"--EJECUTAR TABLAS--"+ Style.RESET_ALL)
         print("1. Proveedores     ")
         print("2. Categoria       ")
         print("3. Articulos       ")
@@ -33,7 +35,7 @@ class Principal:
     def ejecutar_tablas(self):
         while True:
             self.menu_tabla()
-            opcion_tabla=str(input("Ingrese el numero de la tabla a elijir:\n")).strip()
+            opcion_tabla=str(input(Fore.YELLOW +"Ingrese el numero de la tabla que desea ejecutar:\n"+ Style.RESET_ALL)).strip()
 
             if opcion_tabla =="":
                 print("El campo no puede estar vacio")
@@ -79,7 +81,7 @@ class Principal:
                 print("Opcion incorrecta")
 
     def menuCrud(self):
-        print("LISTADO DE OPCIONES")
+        print(Fore.YELLOW +"LISTADO DE OPCIONES"+ Style.RESET_ALL)
         print("1.Ingresar ")
         print("2.Listar ")
         print("3.Buscar ")
@@ -90,14 +92,14 @@ class Principal:
     def ejecutar_proveedor(self):
         while True:
             self.menuCrud()
-            opcionMenu=str(input("Ingrese la opcion del 1 al 6: ")).strip()
+            opcionMenu=str(input(Fore.YELLOW +"Ingrese la opcion del 1 al 6: "+ Style.RESET_ALL)).strip()
 
             if opcionMenu =="":
                 print("El campo no puede estar vacio")
                 continue
 
             elif opcionMenu =="1":
-                print("Ingresar proveedores")
+                print(Fore.YELLOW +"Ingresar proveedores"+ Style.RESET_ALL)
                 while True:
                     nombre_empresa=str(input("Ingrese el nombre de la empresa: ")).strip()
                     
@@ -114,27 +116,27 @@ class Principal:
                 
                     
                     if self.proveedores.buscar_por_telefono(telefono) is not None:
-                        print("El telefono ya existe en el sistema. Ingrese otro.")
+                        print(Fore.RED +"El telefono ya existe en el sistema. Ingrese otro."+ Style.RESET_ALL)
                         continue
                     break
                             
                 datos=self.proveedores.registrar_proveedores(nombre_empresa,telefono)
                 if datos:
-                    print("Datos registrado  correctamente")
+                    print(Fore.GREEN +"Datos registrado  correctamente"+ Style.RESET_ALL)
                 else:
-                    print("Hubo un error al registrar los datos del proveedor")
+                    print(Fore.RED +"Hubo un error al registrar los datos del proveedor"+ Style.RESET_ALL)
                     
             elif opcionMenu =="2":
-                print("Listar proveedores")
+                print(Fore.YELLOW +"Listar proveedores"+ Style.RESET_ALL)
                 lista=self.proveedores.listar_proveedores()
                 if not lista:
-                    print("No hay proveedores para mostrar")
+                    print(Fore.RED +"No hay proveedores para mostrar"+ Style.RESET_ALL)
                 else:
                     for prove in lista:
                         print(f"ID:{prove[0]} | NOMBRE:{prove[1]} | TELEFONO:{prove[2]}")
 
             elif opcionMenu =="3":
-                print("Buscar proveedor")
+                print(Fore.YELLOW +"Buscar proveedor"+ Style.RESET_ALL)
                 while True:
                         buscar_telefono=str(input("Ingrese el telefono a buscar, '0' para salir: ")).strip()
                         if buscar_telefono=="":
@@ -145,14 +147,14 @@ class Principal:
                             break
                         buscando_tele=self.proveedores.buscar_por_telefono(buscar_telefono)
                         if  buscando_tele is None:
-                            print("No se encontro el proveedor con ese telefono.")
+                            print(Fore.RED +"No se encontro el proveedor con ese telefono. Vuelva a intentarlo"+ Style.RESET_ALL)
                             continue
                         else:
                             print(f"ID: {buscando_tele[0]} | NOMBRE: {buscando_tele[1]} | TELEFONO: {buscando_tele[2]}")
                             break
                     
             elif opcionMenu =="4":
-                print("Editar Proveedor")
+                print(Fore.YELLOW +"Editar Proveedor"+ Style.RESET_ALL)
                 while True:
                     try:
                         id_editar=int(input("Ingrese el ID a editar, 0 para volver al menu de proveedores: "))
@@ -164,7 +166,7 @@ class Principal:
 
                             break
                         else:
-                            print(f"El ID: {id_editar} no se encontro")
+                            print(f"{Fore.RED}El ID: {id_editar} no se encontro{Style.RESET_ALL}")
                     except ValueError:
                         print("El ID debe ser un numero entero")
                             
@@ -185,14 +187,14 @@ class Principal:
                     break
                         # Guardamos los cambios llamando al  metodo de editar
                 if self.proveedores.editar_proveedor(nuevo_nombre,nuevo_telefono,id_editar):
-                    print("Proveedores editado con exito")
+                    print(Fore.GREEN +"Proveedores editado con exito"+ Style.RESET_ALL)
                 else:
-                    print("Error al guardar los cambios")
+                    print(Fore.RED +"Error al guardar los cambios"+ Style.RESET_ALL)
 
                             
 
             elif opcionMenu =="5":
-                print("eliminar proveedor")
+                print(Fore.YELLOW +"eliminar proveedor"+ Style.RESET_ALL)
 
                 while True:
                         try:
@@ -205,10 +207,10 @@ class Principal:
                             continue
                         eliminado_exitoso=self.proveedores.eliminar_proveedor(id_eliminar)
                         if not eliminado_exitoso:
-                            print(f"No existe ningun proveedor con el Id {id_eliminar}. Intente de nuevo")
+                            print(f"{Fore.RED}No existe ningun proveedor con el Id {id_eliminar}. Intente de nuevo{Style.RESET_ALL}")
                             continue
                         else:
-                            print("Proveedor eliminado con exito")
+                            print(Fore.GREEN +"Proveedor eliminado con exito"+ Style.RESET_ALL)
                             break
 
 
@@ -1295,7 +1297,8 @@ class Principal:
 
 '''   
 ESTO LO COMENTO PORQUE VOY A USAR EL ARCHIVO INTERFAZ MENU PARA INTERACTUAR
-CON EL MENU           
+CON EL MENU   
+
 if __name__ == "__main__":
     principal=Principal()
     principal.ejecutar_tablas()

@@ -99,7 +99,7 @@ class Detalle_venta:
     def eliminar_detalle(self, id_detalle):
         db = Generico()
         cur = None
-        
+
         '''
         para eliminar algun de detalle de venta hacemos lo siguiente:
         1. busco en detatalle venta que articulo era y que cantidad se iba a llevar usando el id_detalle
@@ -175,6 +175,7 @@ class Detalle_venta:
                 if not resultado_articulo:
                     print("Error: El nuevo ID articulo no existe")
                     return False
+                
                 
                 precio_articulo = resultado_articulo[0]
                 stock_actual_nuevo = resultado_articulo[1]

@@ -12,7 +12,7 @@ class Articulos:
             try:
               cur= db.conexion.cursor()#creamos el cursor,que es el objeto que nos permite enviar sentencias sql a la base de datos.
               consulta="INSERT INTO articulos(nombre,precio,stock,id_proveedor,id_categoria) VALUES (%s,%s,%s,%s,%s)"
-              cur.execute(consulta,(nombre,precio,stock,id_proveedor,id_categoria,))
+              cur.execute(consulta,(nombre,precio,stock,id_proveedor,id_categoria))
               db.conexion.commit()
 
               return True
