@@ -10,6 +10,14 @@ class Detalle_venta:
     def agregar_detalle_venta(self,cantidad,sub_total,id_articulo,id_venta):
         db = Generico()
         cur=None
+        
+        ''' hacemos la consulta para devolver lo que habia al stock, el campo %s se reemplaza despues por
+            cantidad, no coloco la variable directamente por seguridad de inyeccion, en el rollback
+            lo uso por si falla en insert o el update cancele la ejecucion, solo va a guardar los cambios
+            si todas las consultas salen bien.
+                       
+            '''
+
        
         if db.conexion.is_connected(): 
             try:
@@ -92,6 +100,16 @@ class Detalle_venta:
         db = Generico()
         cur = None
         
+        '''
+        para eliminar algun de detalle de venta hacemos lo siguiente:
+        1. busco en detatalle venta que articulo era y que cantidad se iba a llevar usando el id_detalle
+        2.Tomo esa cantidad que en este caso se llama, cantidad_a_devolver y se suma otra vez al stock del 
+        articulo. (SET stock = stock + %s). El %s-> se reemplaza por la variable cantidad_a_devolver
+        se hace asi para proteger los datos de las inyecciones.
+        3.Una vez que el stock vuelve a su lugar, hacemos el delete para borrar el registro de detalle venta
+        
+        '''
+
         if db.conexion.is_connected():
             try:
                 cur = db.conexion.cursor()
@@ -104,10 +122,13 @@ class Detalle_venta:
                 # Guardamos esos datos en variabes para usarlas en el siguiente
                 id_articulo=resultado[0]
                 cantidad_a_devolver=resultado[1]
-                #hacemos la consulta para devolver lo que habia al stock
+
+
 
                 cur.execute("UPDATE articulos SET stock = stock + %s WHERE id_articulo =%s",(cantidad_a_devolver,id_articulo))
 
+
+                #hacemos la consulta para eliminar el deatalle de venta
                 cur.execute("DELETE FROM detalle_ventas WHERE id_detalle = %s", (id_detalle,))
             
                 # Confirmamos todas las operaciones juntas en la base de datos

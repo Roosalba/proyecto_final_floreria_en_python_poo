@@ -1,9 +1,8 @@
-
-from principal import Principal  # Conectamos con tu clase principal
+from principal import Principal # importamos la clase principal
 
 class MenuInteractivo:
     def __init__(self):
-        # Creamos una instancia de tu sistema original
+        # Creamos una instancia de la clese  original(Principal)
         self.sistema = Principal()
 
     
